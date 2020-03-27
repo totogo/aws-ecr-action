@@ -7,7 +7,7 @@ function main() {
   sanitize "${INPUT_REGION}" "region"
   sanitize "${INPUT_ACCOUNT_ID}" "account_id"
   sanitize "${INPUT_REPO}" "repo"
-  sanitize "${INPUT_ASSUME_ROLE}" "assume_role"
+  # sanitize "${INPUT_ASSUME_ROLE}" "assume_role"
   
   if [[ $INPUT_REGION == cn-* ]]; then
     ACCOUNT_URL="$INPUT_ACCOUNT_ID.dkr.ecr.$INPUT_REGION.amazonaws.com.cn"
