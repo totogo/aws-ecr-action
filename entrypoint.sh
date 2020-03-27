@@ -8,9 +8,13 @@ function main() {
   sanitize "${INPUT_ACCOUNT_ID}" "account_id"
   sanitize "${INPUT_REPO}" "repo"
   sanitize "${INPUT_ASSUME_ROLE}" "assume_role"
-
-  ACCOUNT_URL="$INPUT_ACCOUNT_ID.dkr.ecr.$INPUT_REGION.amazonaws.com"
-
+  
+  if [[ $INPUT_REGION == cn-* ]]; then
+    ACCOUNT_URL="$INPUT_ACCOUNT_ID.dkr.ecr.$INPUT_REGION.amazonaws.com.cn"
+  else
+    ACCOUNT_URL="$INPUT_ACCOUNT_ID.dkr.ecr.$INPUT_REGION.amazonaws.com"
+  fi
+  
   aws_configure
   assume_role
   login
@@ -42,7 +46,11 @@ function login() {
 function assume_role() {
   if [ "${INPUT_ASSUME_ROLE}" != "" ]; then
     echo "== START ASSUME ROLE"
-    ROLE="arn:aws:iam::${INPUT_ACCOUNT_ID}:role/${INPUT_ASSUME_ROLE}"
+    if [[ $INPUT_REGION == cn-* ]]; then
+      ROLE="arn:aws-cn:iam::${INPUT_ACCOUNT_ID}:role/${INPUT_ASSUME_ROLE}"
+    else
+      ROLE="arn:aws:iam::${INPUT_ACCOUNT_ID}:role/${INPUT_ASSUME_ROLE}"
+    fi
     CREDENTIALS=$(aws sts assume-role --role-arn ${ROLE} --role-session-name ecrpush --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)
     read id key token <<< ${CREDENTIALS}
     export AWS_ACCESS_KEY_ID="${id}"
